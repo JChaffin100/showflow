@@ -21,46 +21,8 @@ export function formatShortTime(date) {
  * @returns {Date} local Date object
  */
 export function easternToLocalDate(dateStr, airtime) {
-  if (!airtime || !dateStr) return null;
-  const [hours, minutes] = airtime.split(':').map(Number);
-  // Build an ISO string treating the time as Eastern
-  // Eastern = UTC-5 (EST) or UTC-4 (EDT)
-  // We use Intl to figure out the offset for that specific date/time
-  const isoString = `${dateStr}T${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:00`;
-
-  // Parse as Eastern time by creating the date in ET context
-  // Use the trick: format a known UTC date in ET and compute offset
-  const etDate = new Date(`${isoString}+00:00`); // treat as UTC first to get a Date
-
-  // Get the ET offset for this moment
-  const etFormatter = new Intl.DateTimeFormat('en-US', {
-    timeZone: 'America/New_York',
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false,
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  });
-
-  // Better approach: construct the date as if the airtime IS Eastern time
-  // by creating a UTC date that, when displayed in ET, shows the airtime
-  const testDate = new Date(`${dateStr}T12:00:00Z`);
-  const etParts = etFormatter.formatToParts(testDate);
-  const etYear = etParts.find(p => p.type === 'year')?.value;
-  const etMonth = etParts.find(p => p.type === 'month')?.value;
-  const etDay = etParts.find(p => p.type === 'day')?.value;
-
-  // Find the UTC offset for America/New_York on this date
-  // by comparing UTC time to ET time
-  const utcMs = testDate.getTime();
-  const etDisplayDate = new Date(`${etYear}-${etMonth}-${etDay}T12:00:00Z`);
-  const offset = utcMs - etDisplayDate.getTime(); // offset in ms between UTC and ET reference
-
-  // Create the target ET time as UTC
-  const targetUtc = new Date(`${dateStr}T${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:00Z`);
-  // Adjust by the offset to get the real UTC time
-  return new Date(targetUtc.getTime() + offset);
+  // Alias for compatibility if still used anywhere
+  return convertEasternToLocal(dateStr, airtime);
 }
 
 /**
@@ -72,35 +34,15 @@ export function easternToLocalDate(dateStr, airtime) {
 export function convertEasternToLocal(dateStr, airtime) {
   if (!airtime || !dateStr) return null;
   try {
+    // TVmaze returns Eastern broadcast times. We specifically want to treat these 
+    // as Local Time so that broadcast primetime (e.g. 8 PM ABC) aligns with local 
+    // schedules across the US, matching user expectations for TV listings.
     const [hours, minutes] = airtime.split(':').map(Number);
-
-    // Create a date string that represents this time in Eastern timezone
-    // We'll use a manual offset approach based on DST rules
-    const month = parseInt(dateStr.split('-')[1], 10);
-    const day = parseInt(dateStr.split('-')[2], 10);
-    const year = parseInt(dateStr.split('-')[0], 10);
-
-    // Determine if Eastern Daylight Time (EDT, UTC-4) or Eastern Standard Time (EST, UTC-5)
-    // DST in US: Second Sunday of March at 2:00 AM to First Sunday of November at 2:00 AM
-    const isDST = isEasternDST(year, month, day, hours);
-    const offsetHours = isDST ? 4 : 5; // UTC offset (positive = behind UTC)
-
-    const utcHours = hours + offsetHours;
-    let utcDate = dateStr;
-    let finalHours = utcHours;
-
-    if (finalHours >= 24) {
-      finalHours -= 24;
-      // Increment date by 1 day
-      const d = new Date(`${dateStr}T00:00:00Z`);
-      d.setUTCDate(d.getUTCDate() + 1);
-      utcDate = d.toISOString().split('T')[0];
-    }
-
-    const utcString = `${utcDate}T${String(finalHours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:00Z`;
-    return new Date(utcString);
+    const d = new Date(`${dateStr}T00:00:00`);
+    d.setHours(hours, minutes, 0, 0);
+    return d;
   } catch (e) {
-    console.error('Error converting ET to local:', e);
+    console.error('Error parsing time:', e);
     return null;
   }
 }

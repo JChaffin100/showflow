@@ -68,10 +68,6 @@ export function channelMatches(networkName, channelName) {
   return net === ch || net.includes(ch) || ch.includes(net);
 }
 
-/**
- * Get the channel name from our list that best matches a TVmaze network name.
- * Returns null if no match found.
- */
 export function matchChannel(networkName, channelList = DEFAULT_CHANNELS) {
   if (!networkName) return null;
   const net = normalize(networkName);
@@ -80,12 +76,27 @@ export function matchChannel(networkName, channelList = DEFAULT_CHANNELS) {
   const exact = channelList.find(ch => normalize(ch) === net);
   if (exact) return exact;
 
-  // Partial match
-  const partial = channelList.find(ch => {
+  // Known strict aliases mapping from TVmaze names -> Our names
+  const ALIASES = {
+    'the cw': 'The CW',
+    'fox broadcasting company': 'FOX',
+    'american broadcasting company': 'ABC',
+    'national broadcasting company': 'NBC',
+    'columbia broadcasting system': 'CBS',
+    'public broadcasting service': 'PBS',
+    'a&e network': 'A&E',
+  };
+  
+  if (ALIASES[net]) {
+    return channelList.find(ch => normalize(ch) === normalize(ALIASES[net])) || null;
+  }
+
+  // High-confidence partial match: e.g. 'CNN Network' -> 'CNN'
+  const safePartial = channelList.find(ch => {
     const chN = normalize(ch);
-    return net.includes(chN) || chN.includes(net);
+    return net === `${chN} channel` || net === `${chN} network`;
   });
-  return partial || null;
+  return safePartial || null;
 }
 
 /**

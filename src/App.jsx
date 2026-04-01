@@ -113,13 +113,41 @@ export default function App() {
   const scrollToNow = useCallback(() => {
     const now = new Date();
     const todayStr = getTodayString();
-    // Always switch to today so Now is meaningful
+    
     if (selectedDate !== todayStr) {
       setSelectedDate(todayStr);
-      setStartTime(null);
     }
-    scrollToTime(todayStr, now);
-  }, [selectedDate, scrollToTime]);
+    
+    // Snap start time to 1 hr before now, rounded down to half hour
+    let startHour = now.getHours() - 1;
+    let startMin = now.getMinutes() >= 30 ? 30 : 0;
+    if (startHour < 0) {
+      startHour = 0;
+      startMin = 0;
+    }
+    
+    const newStartTime = `${String(startHour).padStart(2, '0')}:${String(startMin).padStart(2, '0')}`;
+    setStartTime(newStartTime);
+
+    // Give the Grid time to re-render with the new start window
+    setTimeout(() => {
+      if (!gridScrollRef.current) return;
+      
+      // Calculate offset against the newly set start time
+      const gridStart = new Date(`${todayStr}T00:00:00`);
+      gridStart.setHours(startHour, startMin, 0, 0);
+      
+      const offset = timeToPixels(now, gridStart, SLOT_WIDTH);
+      const containerWidth = gridScrollRef.current.clientWidth;
+      const scrollTo = Math.max(0, offset - containerWidth / 2);
+      
+      // Use smooth scroll
+      gridScrollRef.current.scrollTo({
+        left: scrollTo,
+        behavior: 'smooth'
+      });
+    }, 150);
+  }, [selectedDate]);
 
   const handleSearchNavigate = useCallback((dateStr, localTime, episode) => {
     setSelectedDate(dateStr);
