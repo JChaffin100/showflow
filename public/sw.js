@@ -1,4 +1,4 @@
-const VERSION = '1.0.1';
+const VERSION = '1.0.2';
 const CACHE_NAME = `showflow-v${VERSION}`;
 
 const STATIC_ASSETS = [
@@ -29,7 +29,14 @@ self.addEventListener('activate', (event) => {
           .filter((name) => name.startsWith('showflow-') && name !== CACHE_NAME)
           .map((name) => caches.delete(name))
       );
-    }).then(() => self.clients.claim())
+    }).then(() => {
+      return self.clients.claim();
+    }).then(() => {
+      // Tell all open tabs to reload so they pick up the new JS/CSS bundle
+      return self.clients.matchAll({ type: 'window' }).then((clients) => {
+        clients.forEach((client) => client.postMessage({ type: 'RELOAD' }));
+      });
+    })
   );
 });
 
