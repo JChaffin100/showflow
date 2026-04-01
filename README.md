@@ -76,25 +76,41 @@ npm run preview
 
 ## Deployment (GitHub Pages)
 
-ShowFlow is pre-configured to deploy to GitHub Pages from the `dist/` folder.
+ShowFlow supports two deployment methods — automated (recommended) and manual.
 
-### One-time setup
+### One-time setup (both methods)
 
 1. Create a GitHub repository named `showflow` (or update `base` in `vite.config.js` to match your repo name).
 2. In your repository settings, go to **Settings → Pages** and set the source to the `gh-pages` branch.
-
-### Deploy
-
-```bash
-npm run deploy
-```
-
-This runs `vite build` and then publishes the `dist/` folder to the `gh-pages` branch automatically.
 
 Your app will be live at:
 ```
 https://YOUR_USERNAME.github.io/showflow/
 ```
+
+---
+
+### Automatic deploy on push (recommended)
+
+A GitHub Actions workflow is included at `.github/workflows/deploy.yml`. Every push to `main` will automatically install dependencies, generate icons, build, and publish to the `gh-pages` branch.
+
+No secrets or extra configuration needed — GitHub provides `GITHUB_TOKEN` automatically.
+
+To monitor deployments, go to the **Actions** tab in your GitHub repository.
+
+---
+
+### Manual deploy
+
+To publish from your local machine at any time:
+
+```bash
+npm run deploy
+```
+
+This builds the app and pushes `dist/` to the `gh-pages` branch directly. Both methods work fine side by side.
+
+---
 
 > **Note:** The `404.html` file in `public/` handles client-side routing redirects on GitHub Pages. The `.nojekyll` file prevents GitHub Pages from ignoring Vite's underscore-prefixed asset files.
 
