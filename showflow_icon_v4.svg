@@ -1,0 +1,63 @@
+<svg width="100%" viewBox="0 0 400 410" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <clipPath id="iconClip">
+    <rect x="0" y="0" width="400" height="400" rx="80"/>
+  </clipPath>
+  <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+    <stop offset="0%" style="stop-color:#1e7be8"/>
+    <stop offset="100%" style="stop-color:#0832a0"/>
+  </linearGradient>
+  <linearGradient id="ribbon1" x1="0%" y1="0%" x2="100%" y2="0%">
+    <stop offset="0%" style="stop-color:#ff5500"/>
+    <stop offset="100%" style="stop-color:#ffcc00"/>
+  </linearGradient>
+  <linearGradient id="ribbon2" x1="0%" y1="0%" x2="100%" y2="0%">
+    <stop offset="0%" style="stop-color:#cc0066"/>
+    <stop offset="100%" style="stop-color:#ff44cc"/>
+  </linearGradient>
+  <linearGradient id="ribbon3" x1="0%" y1="0%" x2="100%" y2="0%">
+    <stop offset="0%" style="stop-color:#00a88a"/>
+    <stop offset="100%" style="stop-color:#00eedd"/>
+  </linearGradient>
+  <linearGradient id="screenGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+    <stop offset="0%" style="stop-color:#0a2060"/>
+    <stop offset="100%" style="stop-color:#060e30"/>
+  </linearGradient>
+</defs>
+
+<g clip-path="url(#iconClip)" style="fill:rgb(0, 0, 0);stroke:none;color:rgb(0, 0, 0);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">
+  <rect x="0" y="0" width="400" height="400" fill="url(#bgGrad)" style="stroke:none;color:rgb(0, 0, 0);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+
+  <!-- Subtle radial highlight top-left -->
+  <ellipse cx="80" cy="70" rx="160" ry="120" fill="white" opacity="0.07" style="fill:rgb(255, 255, 255);stroke:none;color:rgb(0, 0, 0);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:0.07;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+
+  <!-- Teal ribbon — bottom -->
+  <path d="M-20 340 Q120 265 230 305 Q310 332 430 265" fill="none" stroke="url(#ribbon3)" stroke-width="36" stroke-linecap="round" style="fill:none;color:rgb(0, 0, 0);stroke-width:36px;stroke-linecap:round;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+  <path d="M-20 340 Q120 265 230 305 Q310 332 430 265" fill="none" stroke="white" stroke-width="6" stroke-linecap="round" opacity="0.14" style="fill:none;stroke:rgb(255, 255, 255);color:rgb(0, 0, 0);stroke-width:6px;stroke-linecap:round;stroke-linejoin:miter;opacity:0.14;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+
+  <!-- Magenta ribbon — middle -->
+  <path d="M-20 285 Q110 200 225 242 Q315 275 430 200" fill="none" stroke="url(#ribbon2)" stroke-width="36" stroke-linecap="round" style="fill:none;color:rgb(0, 0, 0);stroke-width:36px;stroke-linecap:round;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+  <path d="M-20 285 Q110 200 225 242 Q315 275 430 200" fill="none" stroke="white" stroke-width="6" stroke-linecap="round" opacity="0.14" style="fill:none;stroke:rgb(255, 255, 255);color:rgb(0, 0, 0);stroke-width:6px;stroke-linecap:round;stroke-linejoin:miter;opacity:0.14;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+
+  <!-- Orange ribbon — top of ribbon group -->
+  <path d="M-20 230 Q100 138 220 178 Q315 212 430 135" fill="none" stroke="url(#ribbon1)" stroke-width="36" stroke-linecap="round" style="fill:none;color:rgb(0, 0, 0);stroke-width:36px;stroke-linecap:round;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+  <path d="M-20 230 Q100 138 220 178 Q315 212 430 135" fill="none" stroke="white" stroke-width="6" stroke-linecap="round" opacity="0.18" style="fill:none;stroke:rgb(255, 255, 255);color:rgb(0, 0, 0);stroke-width:6px;stroke-linecap:round;stroke-linejoin:miter;opacity:0.18;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+
+  <!-- TV screen body -->
+  <rect x="120" y="58" width="160" height="114" rx="12" fill="url(#screenGrad)" stroke="white" stroke-width="4" opacity="0.97" style="stroke:rgb(255, 255, 255);color:rgb(0, 0, 0);stroke-width:4px;stroke-linecap:butt;stroke-linejoin:miter;opacity:0.97;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+  <!-- Inner screen -->
+  <rect x="130" y="68" width="140" height="92" rx="7" fill="#040d28" style="fill:rgb(4, 13, 40);stroke:none;color:rgb(0, 0, 0);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+
+  <!-- Play button -->
+  <circle cx="200" cy="114" r="24" fill="white" opacity="0.12" style="fill:rgb(255, 255, 255);stroke:none;color:rgb(0, 0, 0);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:0.12;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+  <polygon points="192,103 192,125 216,114" fill="white" opacity="0.92" style="fill:rgb(255, 255, 255);stroke:none;color:rgb(0, 0, 0);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:0.92;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+
+  <!-- TV stand neck -->
+  <rect x="196" y="172" width="9" height="14" rx="3" fill="white" opacity="0.65" style="fill:rgb(255, 255, 255);stroke:none;color:rgb(0, 0, 0);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:0.65;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+  <!-- TV stand base -->
+  <rect x="172" y="184" width="56" height="9" rx="4" fill="white" opacity="0.55" style="fill:rgb(255, 255, 255);stroke:none;color:rgb(0, 0, 0);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:0.55;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+
+  <!-- ShowFlow wordmark — bottom, below ribbons, on solid-ish dark area -->
+  <text x="200" y="382" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="30" font-weight="800" fill="white" opacity="0.93" letter-spacing="0.5" style="fill:rgb(255, 255, 255);stroke:none;color:rgb(0, 0, 0);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:0.93;font-family:system-ui, -apple-system, sans-serif;font-size:30px;font-weight:800;text-anchor:middle;dominant-baseline:auto">ShowFlow</text>
+</g>
+</svg>

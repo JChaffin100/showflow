@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ShowFlow</title>
+    <meta name="description" content="Your personal TV listings guide" />
+    <meta name="theme-color" content="#1e7be8" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="ShowFlow" />
+
+    <link rel="manifest" href="/showflow/manifest.json" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/showflow/icons/icon-32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/showflow/icons/icon-16.png" />
+    <link rel="shortcut icon" href="/showflow/icons/favicon.ico" />
+
+    <!-- Apple touch icons -->
+    <link rel="apple-touch-icon" href="/showflow/icons/icon-180.png" />
+    <link rel="apple-touch-icon" sizes="57x57" href="/showflow/icons/icon-57.png" />
+    <link rel="apple-touch-icon" sizes="60x60" href="/showflow/icons/icon-60.png" />
+    <link rel="apple-touch-icon" sizes="72x72" href="/showflow/icons/icon-72.png" />
+    <link rel="apple-touch-icon" sizes="76x76" href="/showflow/icons/icon-76.png" />
+    <link rel="apple-touch-icon" sizes="114x114" href="/showflow/icons/icon-114.png" />
+    <link rel="apple-touch-icon" sizes="120x120" href="/showflow/icons/icon-120.png" />
+    <link rel="apple-touch-icon" sizes="144x144" href="/showflow/icons/icon-144.png" />
+    <link rel="apple-touch-icon" sizes="152x152" href="/showflow/icons/icon-152.png" />
+    <link rel="apple-touch-icon" sizes="167x167" href="/showflow/icons/icon-167.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/showflow/icons/icon-180.png" />
+
+    <script>
+      // Apply theme before React loads to avoid flash
+      (function() {
+        try {
+          const prefs = JSON.parse(localStorage.getItem('showflow_prefs') || '{}');
+          const theme = prefs.theme || 'system';
+          if (theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+          } else {
+            document.documentElement.setAttribute('data-theme', 'light');
+          }
+        } catch(e) {
+          document.documentElement.setAttribute('data-theme', 'light');
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/showflow/sw.js')
+            .then(reg => console.log('SW registered:', reg.scope))
+            .catch(err => console.warn('SW registration failed:', err));
+        });
+      }
+    </script>
+  </body>
+</html>
