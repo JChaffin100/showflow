@@ -19,10 +19,39 @@ export function formatShortTime(date) {
  * @param {string} dateStr - "YYYY-MM-DD"
  * @param {string} airtime - "HH:MM" in Eastern time (e.g. "20:00")
  * @returns {Date} local Date object
- */
 export function easternToLocalDate(dateStr, airtime) {
-  // Alias for compatibility if still used anywhere
-  return convertEasternToLocal(dateStr, airtime);
+  if (!airtime || !dateStr) return null;
+  const [hours, minutes] = airtime.split(':').map(Number);
+  
+  // Build an ISO string treating the time as Eastern
+  // We construct a UTC date and then use Intl to find the offset
+  const isoString = `${dateStr}T${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:00`;
+  
+  // Get the ET offset for this moment by constructing the target date
+  const testDate = new Date(`${dateStr}T12:00:00Z`);
+  const etFormatter = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/New_York',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  });
+
+  const etParts = etFormatter.formatToParts(testDate);
+  const etYear = etParts.find(p => p.type === 'year')?.value;
+  const etMonth = etParts.find(p => p.type === 'month')?.value;
+  const etDay = etParts.find(p => p.type === 'day')?.value;
+
+  // Find the UTC offset for America/New_York on this date
+  const utcMs = testDate.getTime();
+  const etDisplayDate = new Date(`${etYear}-${etMonth}-${etDay}T12:00:00Z`);
+  const offset = utcMs - etDisplayDate.getTime();
+
+  // Create the target ET time as UTC, then adjust by offset
+  const targetUtc = new Date(`${dateStr}T${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:00Z`);
+  return new Date(targetUtc.getTime() + offset);
 }
 
 /**
@@ -34,15 +63,31 @@ export function easternToLocalDate(dateStr, airtime) {
 export function convertEasternToLocal(dateStr, airtime) {
   if (!airtime || !dateStr) return null;
   try {
-    // TVmaze returns Eastern broadcast times. We specifically want to treat these 
-    // as Local Time so that broadcast primetime (e.g. 8 PM ABC) aligns with local 
-    // schedules across the US, matching user expectations for TV listings.
     const [hours, minutes] = airtime.split(':').map(Number);
-    const d = new Date(`${dateStr}T00:00:00`);
-    d.setHours(hours, minutes, 0, 0);
-    return d;
+
+    // Manual offset based on US DST rules
+    const month = parseInt(dateStr.split('-')[1], 10);
+    const day = parseInt(dateStr.split('-')[2], 10);
+    const year = parseInt(dateStr.split('-')[0], 10);
+
+    const isDST = isEasternDST(year, month, day, hours);
+    const offsetHours = isDST ? 4 : 5; // UTC-4 EDT, UTC-5 EST
+
+    const utcHours = hours + offsetHours;
+    let utcDate = dateStr;
+    let finalHours = utcHours;
+
+    if (finalHours >= 24) {
+      finalHours -= 24;
+      const d = new Date(`${dateStr}T00:00:00Z`);
+      d.setUTCDate(d.getUTCDate() + 1);
+      utcDate = d.toISOString().split('T')[0];
+    }
+
+    const utcString = `${utcDate}T${String(finalHours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:00Z`;
+    return new Date(utcString);
   } catch (e) {
-    console.error('Error parsing time:', e);
+    console.error('Error converting ET to local:', e);
     return null;
   }
 }
@@ -62,12 +107,6 @@ function isEasternDST(year, month, day, hour = 0) {
   return current >= start && current < end;
 }
 
-/**
- * Get the day-of-month of the Nth Sunday in a given month/year.
- * @param {number} year
- * @param {number} month - 1-indexed
- * @param {number} n - which Sunday (1 = first, 2 = second, etc.)
- */
 function nthSundayOfMonth(year, month, n) {
   let count = 0;
   for (let day = 1; day <= 31; day++) {
@@ -80,6 +119,7 @@ function nthSundayOfMonth(year, month, n) {
   }
   return 1;
 }
+
 
 /**
  * Get an array of date strings for today + next N days.
