@@ -96,37 +96,39 @@ export default function App() {
     }
   };
 
-  const scrollToNow = useCallback(() => {
-    if (!gridScrollRef.current) return;
-    const now = new Date();
-    // Build grid start time from effectiveStartTime
-    const [h, m] = effectiveStartTime.split(':').map(Number);
-    const gridStart = new Date(selectedDate + 'T00:00:00');
-    gridStart.setHours(h, m, 0, 0);
-
-    const offset = timeToPixels(now, gridStart, SLOT_WIDTH);
-    // Center the now line in view
-    const containerWidth = gridScrollRef.current.clientWidth;
-    const scrollTo = Math.max(0, offset - containerWidth / 2);
-    gridScrollRef.current.scrollTo({ left: scrollTo, behavior: 'smooth' });
-  }, [effectiveStartTime, selectedDate]);
-
-  const handleSearchNavigate = useCallback((dateStr, localTime) => {
-    setSelectedDate(dateStr);
-    // After state update, scroll to the time
-    if (localTime) {
-      setTimeout(() => {
-        if (!gridScrollRef.current) return;
-        const [h, m] = effectiveStartTime.split(':').map(Number);
-        const gridStart = new Date(dateStr + 'T00:00:00');
-        gridStart.setHours(h, m, 0, 0);
-        const offset = timeToPixels(localTime, gridStart, SLOT_WIDTH);
-        const containerWidth = gridScrollRef.current.clientWidth;
-        const scrollTo = Math.max(0, offset - containerWidth / 2);
-        gridScrollRef.current.scrollTo({ left: scrollTo, behavior: 'smooth' });
-      }, 200);
-    }
+  const scrollToTime = useCallback((targetDate, targetTime) => {
+    // Give React time to re-render if date just changed
+    setTimeout(() => {
+      if (!gridScrollRef.current) return;
+      const [h, m] = effectiveStartTime.split(':').map(Number);
+      const gridStart = new Date(targetDate + 'T00:00:00');
+      gridStart.setHours(h, m, 0, 0);
+      const offset = timeToPixels(targetTime, gridStart, SLOT_WIDTH);
+      const containerWidth = gridScrollRef.current.clientWidth;
+      const scrollTo = Math.max(0, offset - containerWidth / 2);
+      gridScrollRef.current.scrollLeft = scrollTo;
+    }, 150);
   }, [effectiveStartTime]);
+
+  const scrollToNow = useCallback(() => {
+    const now = new Date();
+    const todayStr = getTodayString();
+    // Always switch to today so Now is meaningful
+    if (selectedDate !== todayStr) {
+      setSelectedDate(todayStr);
+      setStartTime(null);
+    }
+    scrollToTime(todayStr, now);
+  }, [selectedDate, scrollToTime]);
+
+  const handleSearchNavigate = useCallback((dateStr, localTime, episode) => {
+    setSelectedDate(dateStr);
+    setStartTime(null);
+    // Open the show modal
+    if (episode) setSelectedEpisode(episode);
+    // Scroll grid to the show's time slot
+    if (localTime) scrollToTime(dateStr, localTime);
+  }, [scrollToTime]);
 
   const handleSetDefaultStartTime = (time) => {
     setDefaultStartTime(time);

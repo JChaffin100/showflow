@@ -60,66 +60,69 @@ export default function Grid({
   const buildChannelRow = useCallback((channelName) => {
     const episodes = byChannel.get(channelName) || [];
 
-    // Convert episodes to local time and filter to grid window
+    // Convert to local time, compute end times, filter to grid window, sort by start
     const localEpisodes = episodes
       .map(ep => {
         const localStart = ep.airdate && ep.airtime
           ? convertEasternToLocal(ep.airdate, ep.airtime)
           : null;
-        return { ...ep, localStart };
+        if (!localStart) return null;
+        const runtime = ep.runtime || 30;
+        const localEnd = new Date(localStart.getTime() + runtime * 60000);
+        return { ...ep, localStart, localEnd };
       })
-      .filter(ep => ep.localStart && ep.localStart < gridEnd &&
-        new Date(ep.localStart.getTime() + (ep.runtime || 30) * 60000) > gridStart)
+      .filter(ep => ep && ep.localEnd > gridStart && ep.localStart < gridEnd)
       .sort((a, b) => a.localStart - b.localStart);
 
     const cells = [];
+    const renderedIds = new Set();
     let cursor = new Date(gridStart);
-    let epIdx = 0;
 
-    while (cursor < gridEnd) {
-      const slotEnd = new Date(cursor.getTime() + 30 * 60000);
+    for (let i = 0; i <= localEpisodes.length; i++) {
+      const ep = localEpisodes[i]; // undefined on final iteration (past last episode)
+      const nextStart = ep ? ep.localStart : gridEnd;
 
-      if (epIdx < localEpisodes.length) {
-        const ep = localEpisodes[epIdx];
-        const epStart = ep.localStart;
-        const epEnd = new Date(epStart.getTime() + (ep.runtime || 30) * 60000);
-
-        if (epStart <= cursor && epEnd > cursor) {
-          // Episode starts at or before cursor
-          // Check if this is the start (avoid duplicate rendering)
-          if (epStart.getTime() === cursor.getTime() ||
-              (epStart < cursor && cells.length === 0)) {
-            cells.push(
-              <ShowBlock
-                key={`${ep.id}-${cursor.getTime()}`}
-                episode={ep}
-                slotWidth={SLOT_WIDTH}
-                onClick={onShowClick}
-                localStartTime={ep.localStart}
-              />
-            );
-            // Advance cursor to end of episode
-            cursor = epEnd;
-            epIdx++;
-            continue;
-          }
-        } else if (epStart > cursor && epStart < slotEnd) {
-          // Episode starts mid-slot: fill gap with rerun
-          const gapSlots = Math.max(1, Math.round((epStart - cursor) / (30 * 60000)));
-          cells.push(<RerunBlock key={`rerun-${cursor.getTime()}`} slotWidth={SLOT_WIDTH} slots={gapSlots} />);
-          cursor = new Date(cursor.getTime() + gapSlots * 30 * 60000);
-          continue;
-        } else if (epStart >= slotEnd) {
-          // Next episode is after this slot — fill with rerun
-          cells.push(<RerunBlock key={`rerun-${cursor.getTime()}`} slotWidth={SLOT_WIDTH} slots={1} />);
-          cursor = slotEnd;
-          continue;
-        }
+      // Fill the gap between cursor and the next episode's start with Reruns
+      if (cursor < nextStart) {
+        const gapMs = Math.min(nextStart.getTime(), gridEnd.getTime()) - cursor.getTime();
+        // Round to nearest slot; minimum 1 slot so we always advance
+        const gapSlots = Math.max(1, Math.round(gapMs / (30 * 60 * 1000)));
+        cells.push(
+          <RerunBlock key={`rerun-${cursor.getTime()}`} slotWidth={SLOT_WIDTH} slots={gapSlots} />
+        );
+        cursor = new Date(cursor.getTime() + gapSlots * 30 * 60 * 1000);
       }
 
-      // No more episodes or gap — rerun
-      cells.push(<RerunBlock key={`rerun-${cursor.getTime()}`} slotWidth={SLOT_WIDTH} slots={1} />);
-      cursor = slotEnd;
+      if (!ep) break; // past all episodes; remaining time already filled above
+
+      // Skip if already rendered (handles overlapping episodes)
+      if (renderedIds.has(ep.id)) continue;
+
+      // Skip if episode ended before we reached it (shouldn't happen after sort, but be safe)
+      if (ep.localEnd <= cursor) continue;
+
+      renderedIds.add(ep.id);
+      cells.push(
+        <ShowBlock
+          key={`ep-${ep.id}`}
+          episode={ep}
+          slotWidth={SLOT_WIDTH}
+          onClick={onShowClick}
+          localStartTime={ep.localStart}
+        />
+      );
+      // Advance cursor to end of this episode
+      cursor = ep.localEnd;
+    }
+
+    // Fill any remaining grid time (cursor may have overshot gridEnd slightly — that's fine)
+    if (cursor < gridEnd) {
+      const remainingSlots = Math.ceil((gridEnd.getTime() - cursor.getTime()) / (30 * 60 * 1000));
+      if (remainingSlots > 0) {
+        cells.push(
+          <RerunBlock key={`rerun-tail`} slotWidth={SLOT_WIDTH} slots={remainingSlots} />
+        );
+      }
     }
 
     return cells;

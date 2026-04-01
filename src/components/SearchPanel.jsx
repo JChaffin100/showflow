@@ -81,8 +81,8 @@ export default function SearchPanel({ onClose, onNavigate, fetchDateOnDemand, ge
     return acc;
   }, {});
 
-  const handleResultClick = (dateStr, localTime) => {
-    onNavigate(dateStr, localTime);
+  const handleResultClick = (dateStr, localTime, ep) => {
+    onNavigate(dateStr, localTime, ep);
     onClose();
   };
 
@@ -120,7 +120,7 @@ export default function SearchPanel({ onClose, onNavigate, fetchDateOnDemand, ge
                 <button
                   key={`${ep.id}-${i}`}
                   className="search-result-item"
-                  onClick={() => handleResultClick(dateStr, localTime)}
+                  onClick={() => handleResultClick(dateStr, localTime, ep)}
                 >
                   <div className="result-show-name">{ep.show?.name}</div>
                   <div className="result-meta">
