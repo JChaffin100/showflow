@@ -23,6 +23,7 @@ export default function Grid({
 }) {
   const scrollContainerRef = useRef(null);
   const headerScrollRef = useRef(null);
+  const channelColRef = useRef(null);
 
   // Pass scroll ref up to parent for "Now" button
   useEffect(() => {
@@ -49,10 +50,13 @@ export default function Grid({
     [scheduleData, visibleChannels]
   );
 
-  // Sync horizontal scroll between header and grid
+  // Sync horizontal scroll between header and grid, and vertical between grid and channels
   const handleScroll = useCallback(() => {
     if (headerScrollRef.current && scrollContainerRef.current) {
       headerScrollRef.current.scrollLeft = scrollContainerRef.current.scrollLeft;
+    }
+    if (channelColRef.current && scrollContainerRef.current) {
+      channelColRef.current.scrollTop = scrollContainerRef.current.scrollTop;
     }
   }, []);
 
@@ -154,7 +158,11 @@ export default function Grid({
       {/* Grid body */}
       <div className="grid-body">
         {/* Sticky channel column */}
-        <div className="channel-col" style={{ width: CHANNEL_COL_WIDTH, minWidth: CHANNEL_COL_WIDTH }}>
+        <div 
+          className="channel-col" 
+          ref={channelColRef}
+          style={{ width: CHANNEL_COL_WIDTH, minWidth: CHANNEL_COL_WIDTH }}
+        >
           {visibleChannels.map(ch => (
             <ChannelCell key={ch} name={ch} width={CHANNEL_COL_WIDTH} />
           ))}
