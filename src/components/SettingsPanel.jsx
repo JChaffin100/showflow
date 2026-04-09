@@ -190,9 +190,9 @@ export default function SettingsPanel({
                 ↑ Import Preferences CSV
                 <input
                   type="file"
-                  accept=".csv"
+                  accept=".csv,text/csv,text/comma-separated-values,text/plain"
                   onChange={handleImport}
-                  style={{ display: 'none' }}
+                  style={{ opacity: 0, position: 'absolute', pointerEvents: 'none', width: '1px', height: '1px' }}
                 />
               </label>
             </div>
