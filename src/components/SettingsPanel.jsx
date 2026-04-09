@@ -186,15 +186,16 @@ export default function SettingsPanel({
               <button className="btn-secondary" onClick={onExportCSV}>
                 ↓ Export Preferences CSV
               </button>
-              <label className="btn-secondary btn-file-label">
+              <label className="btn-secondary btn-file-label" htmlFor="import-prefs-input" style={{ cursor: 'pointer' }}>
                 ↑ Import Preferences CSV
-                <input
-                  type="file"
-                  accept=".csv,text/csv,text/comma-separated-values,text/plain"
-                  onChange={handleImport}
-                  style={{ opacity: 0, position: 'absolute', pointerEvents: 'none', width: '1px', height: '1px' }}
-                />
               </label>
+              <input
+                id="import-prefs-input"
+                type="file"
+                accept=".csv,text/csv,text/plain,application/octet-stream,text/comma-separated-values,application/csv,application/x-csv,text/x-csv,.txt"
+                onChange={handleImport}
+                style={{ position: 'fixed', top: '-100em', left: '-100em', opacity: 0, pointerEvents: 'none' }}
+              />
             </div>
             {importStatus && (
               <div className={`import-status ${importStatus.type}`}>
