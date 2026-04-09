@@ -1,4 +1,4 @@
-const VERSION = '1.0.5';
+const VERSION = '1.0.6';
 const CACHE_NAME = `showflow-v${VERSION}`;
 
 const STATIC_ASSETS = [

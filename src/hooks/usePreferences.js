@@ -108,21 +108,44 @@ export function usePreferences() {
 
   const exportCSV = useCallback(() => {
     const { defaultStartTime, channelOrder, hiddenChannels } = prefs;
+
+    // Helper to escape CSV values (wrap in quotes if contains comma/quote, escape internal quotes)
+    const esc = (val) => {
+      const str = String(val ?? '');
+      if (str.includes(',') || str.includes('"') || str.includes('\n') || str.includes('\r')) {
+        return `"${str.replace(/"/g, '""')}"`;
+      }
+      return str;
+    };
+
     const rows = [
       ['setting', 'value'],
       ['version', '1.0'],
       ['defaultStartTime', defaultStartTime],
-      ['hiddenChannels', `"${hiddenChannels.join(',')}"`],
-      ['channelOrder', `"${channelOrder.join(',')}"`],
+      ['hiddenChannels', hiddenChannels.join(',')],
+      ['channelOrder', channelOrder.join(',')],
     ];
-    const csv = rows.map(r => r.join(',')).join('\n');
-    const blob = new Blob([csv], { type: 'text/csv' });
+
+    // Build CSV with escaped values and Windows line endings
+    const csvContent = rows.map(row => row.map(esc).join(',')).join('\r\n');
+
+    // Add UTF-8 BOM for Windows/Excel compatibility
+    const blob = new Blob(['\uFEFF', csvContent], { type: 'text/csv;charset=utf-8' });
     const url = URL.createObjectURL(blob);
+
     const a = document.createElement('a');
     a.href = url;
     a.download = 'showflow-preferences.csv';
+    a.style.display = 'none';
+    document.body.appendChild(a);
+
     a.click();
-    URL.revokeObjectURL(url);
+
+    // Clean up with a delay to ensure the browser has finished the download handoff
+    setTimeout(() => {
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, 1000);
   }, [prefs]);
 
   const importCSV = useCallback((file) => {
@@ -130,25 +153,48 @@ export function usePreferences() {
       const reader = new FileReader();
       reader.onload = (e) => {
         try {
-          const text = e.target.result;
-          const lines = text.trim().split('\n');
-          if (lines[0].trim() !== 'setting,value') {
-            throw new Error('Invalid format: missing header row');
+          let text = e.target.result;
+          if (!text) throw new Error('File is empty');
+
+          // Strip UTF-8 BOM if present
+          if (text.startsWith('\uFEFF')) {
+            text = text.slice(1);
           }
+
+          // Split by any newline format
+          const lines = text.trim().split(/\r?\n/);
+
+          // Relaxed header check (ignore case/whitespace)
+          const header = lines[0]?.trim().toLowerCase();
+          if (header !== 'setting,value') {
+            throw new Error('Invalid format: missing "setting,value" header');
+          }
+
           const parsed = {};
           for (let i = 1; i < lines.length; i++) {
             const line = lines[i].trim();
             if (!line) continue;
+
             const commaIdx = line.indexOf(',');
             if (commaIdx === -1) continue;
+
             const key = line.slice(0, commaIdx).trim();
-            let value = line.slice(commaIdx + 1).trim().replace(/^"|"$/g, '');
-            parsed[key] = value;
+            // Basic unquoting/cleaning of the value
+            let value = line.slice(commaIdx + 1).trim();
+            if (value.startsWith('"') && value.endsWith('"')) {
+              value = value.slice(1, -1).replace(/""/g, '"');
+            }
+
+            if (key) parsed[key] = value;
           }
 
           const newPrefs = { ...prefs };
-          if (parsed.defaultStartTime) newPrefs.defaultStartTime = parsed.defaultStartTime;
-          if (parsed.channelOrder) newPrefs.channelOrder = parsed.channelOrder.split(',').map(s => s.trim()).filter(Boolean);
+          if (parsed.defaultStartTime) {
+            newPrefs.defaultStartTime = parsed.defaultStartTime;
+          }
+          if (parsed.channelOrder) {
+            newPrefs.channelOrder = parsed.channelOrder.split(',').map(s => s.trim()).filter(Boolean);
+          }
           if (parsed.hiddenChannels !== undefined) {
             newPrefs.hiddenChannels = parsed.hiddenChannels ? parsed.hiddenChannels.split(',').map(s => s.trim()).filter(Boolean) : [];
           }
